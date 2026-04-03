@@ -22,6 +22,7 @@
     library(sf)
     library(dotenv)
   })
+load_dot_env()
 
 load_dot_env()
 

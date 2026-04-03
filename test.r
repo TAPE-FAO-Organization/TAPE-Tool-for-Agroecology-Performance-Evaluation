@@ -42,7 +42,7 @@ stopifnot(
 message("✅ Environment variables loaded")
 
 # ---------- Kobo API call ----------
-kobo_url <- "https://kobo.fao.org/api/v2/assets/ajfT4SY4zcJPVqKCJuuQxH/export-settings/esbp7sH759cPmhmKVHXc3rW/data.csv"
+kobo_url <- "https://kobo.fao.org/api/v2/assets/ajfT4SY4zcJPVqKCJuuQxH/export-settings/eswn645vPV35hd3ULUuZgG9/data.csv"
 
 res <- GET(
   kobo_url,

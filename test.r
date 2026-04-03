@@ -5,24 +5,23 @@
 ############################################
 
 # ---------- Libraries ----------
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(httr)
-  library(jsonlite)
-  library(DBI)
-  library(RPostgres)
-  library(tidyverse)
-  library(dplyr)
-  library(httr)
-  library(readr)
-  library(googlesheets4)
-  #library(taskscheduleR)
-  library(KoboconnectR)
-  library(janitor)
-  library(lubridate)
-  library(sf)
-  library(dotenv)
-})
+  suppressPackageStartupMessages({
+    library(tidyverse)
+    library(httr)
+    library(jsonlite)
+    library(DBI)
+    library(RPostgres)
+    library(tidyverse)
+    library(dplyr)
+    library(httr)
+    library(readr)
+    library(googlesheets4)
+    library(KoboconnectR)
+    library(janitor)
+    library(lubridate)
+    library(sf)
+    library(dotenv)
+  })
 
 # ---------- Environment variables ----------
 kobo_token <- Sys.getenv("KOBO_TOKEN")
@@ -998,32 +997,32 @@ criteria_map <- tibble::tibble(
 ) %>% 
   mutate(
     Index = recode(Indexes,
-                          plant_diversity = "Plant diversity",
-                          temp_spatial_div = "Temporal and spatial diversity",
-                          anim_diversity = "Animal diversity (including fishes and insects)",
-                          crop_liv_aqua = "Plant-livestock-aquaculture integration",
-                          integ_trees = "Integration with trees",
-                          connect_ag = "Habitat management",
-                          seed_breed = "Use of seeds and breeds",
-                          recycling_biomass = "Biomass and waste management",
-                          water_energy = "Water and energy sources",
-                          mgt_soilfert = "Management of soil fertility",
-                          mgt_pestdis = "Management of pests and diseases",
-                          water_and_energy_use = "Water and energy use",
-                          soc_res = "Social resilience",
-                          econ_res = "Economic resilience",
-                          soil_conserve = "Soil conservation practices",
-                          dietdiv_foodself = "Dietary diversity and food self sufficiency",
-                          food_heritage = "Local and traditional food heritage",
-                          int_ageco = "Co-creation of knowledge",
-                          soc_know = "Peer learning and sharing of knowledge",
-                          wom_emp_caet = "Women empowerment",
-                          labour_socinq = "Labour conditions",
-                          labor_condition = "Motivation and youth installation",
-                          local_market = "Local and solidarity-based markets",
-                          local_circ = "Local sourcing and circularity",
-                          prod_empow = "Producers' empowerment",
-                          prod_access = "Producers' access to and control over resources"
+                   plant_diversity = "Plant diversity",
+                   temp_spatial_div = "Temporal and spatial diversity",
+                   anim_diversity = "Animal diversity (including fishes and insects)",
+                   crop_liv_aqua = "Plant-livestock-aquaculture integration",
+                   integ_trees = "Integration with trees",
+                   connect_ag = "Habitat management",
+                   seed_breed = "Use of seeds and breeds",
+                   recycling_biomass = "Biomass and waste management",
+                   water_energy = "Water and energy sources",
+                   mgt_soilfert = "Management of soil fertility",
+                   mgt_pestdis = "Management of pests and diseases",
+                   water_and_energy_use = "Water and energy use",
+                   soc_res = "Social resilience",
+                   econ_res = "Economic resilience",
+                   soil_conserve = "Soil conservation practices",
+                   dietdiv_foodself = "Dietary diversity and food self sufficiency",
+                   food_heritage = "Local and traditional food heritage",
+                   int_ageco = "Co-creation of knowledge",
+                   soc_know = "Peer learning and sharing of knowledge",
+                   wom_emp_caet = "Women empowerment",
+                   labour_socinq = "Labour conditions",
+                   labor_condition = "Motivation and youth installation",
+                   local_market = "Local and solidarity-based markets",
+                   local_circ = "Local sourcing and circularity",
+                   prod_empow = "Producers' empowerment",
+                   prod_access = "Producers' access to and control over resources"
     )
   )
 

@@ -23,8 +23,6 @@
     library(dotenv)
   })
 
-load_dot_env()
-
 # ---------- Environment variables ----------
 kobo_token <- Sys.getenv("KOBO_TOKEN")
 pg_db      <- Sys.getenv("PG_DB")

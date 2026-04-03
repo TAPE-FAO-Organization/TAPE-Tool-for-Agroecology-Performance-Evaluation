@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
   library(janitor)
   library(lubridate)
   library(sf)
+  library(dotenv)
 })
 
 # ---------- Environment variables ----------

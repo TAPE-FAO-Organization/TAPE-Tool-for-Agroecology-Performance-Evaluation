@@ -22,6 +22,7 @@
     library(sf)
     library(dotenv)
   })
+load_dot_env()
 
 # ---------- Environment variables ----------
 kobo_token <- Sys.getenv("KOBO_TOKEN")

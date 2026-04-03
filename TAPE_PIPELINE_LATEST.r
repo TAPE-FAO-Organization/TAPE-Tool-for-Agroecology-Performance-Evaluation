@@ -41,7 +41,7 @@ stopifnot(
 message("✅ Environment variables loaded")
 
 # ---------- Kobo API call ----------
-kobo_url <- "https://kobo.fao.org/api/v2/assets/ajfT4SY4zcJPVqKCJuuQxH/export-settings/eswn645vPV35hd3ULUuZgG9/data.csv"
+kobo_url <- "https://kobo.fao.org/api/v2/assets/ajfT4SY4zcJPVqKCJuuQxH/export-settings/esbp7sH759cPmhmKVHXc3rW/data.csv"
 
 res <- GET(
   kobo_url,
@@ -53,10 +53,11 @@ stopifnot(status_code(res) == 200)
 csv_content <- content(res, as = "text", encoding = "UTF-8")
 
 clean_df <- read_delim(csv_content, delim = ";", show_col_types = FALSE) %>%
+  rename_with(~ gsub("^_", "", .x)) %>% 
+  clean_names() %>% 
   select(-ends_with("note"))
 
 message("✅ Kobo data downloaded")
-
 
 # ---------- Data Quality check  ----------
 
@@ -200,11 +201,11 @@ clean_df <- convert_area_to_ha(
 survey_duration_df <- clean_df %>%
   mutate(
     expected_duration = as.numeric(difftime(end, start, units = "hours")),
-    actual_duration   = as.numeric(difftime(`_submission_time`, start, units = "hours")),
+    actual_duration   = as.numeric(difftime(submission_time, start, units = "hours")),
     ratio = actual_duration / expected_duration,
     log_ratio = log(ratio),
     qc_time_issue = case_when(
-      is.na(start) | is.na(end) | is.na(`_submission_time`) ~ "missing_timestamp",
+      is.na(start) | is.na(end) | is.na(submission_time) ~ "missing_timestamp",
       expected_duration <= 0 ~ "invalid_expected",
       actual_duration <= 0   ~ "invalid_actual",
       TRUE ~ NA_character_
@@ -263,13 +264,13 @@ survey_timing_df <- survey_duration_df %>%
 survey_completeness_df <- survey_timing_df %>% 
   mutate(
     gps_valid = case_when(
-      is.na(`_gps_loc_latitude`) | is.na(`_gps_loc_longitude`) ~
+      is.na(gps_loc_latitude) | is.na(gps_loc_longitude) ~
         "incomplete: missing gps",
-      `_gps_loc_latitude`== 0 & gps_loc_longitude == 0 ~
+      gps_loc_latitude== 0 & gps_loc_longitude == 0 ~
         "incomplete: invalid gps (0,0)",
-      gps_loc_latitude`_gps_loc_latitude` < -90 | gps_loc_latitude > 90 ~
+      gps_loc_latitude < -90 | gps_loc_longitude > 90 ~
         "incomplete: invalid latitude",
-      `_gps_loc_latitude`< -180 | gps_loc_longitude > 180 ~
+      gps_loc_latitude < -180 | gps_loc_longitude > 180 ~
         "incomplete: invalid longitude",
       
       TRUE ~ "complete"
@@ -374,7 +375,7 @@ survey_system_validation_df <- survey_cluster_df %>%
     # Determine whether respondent has economic activities 
     # Using existence variables defined as economic/market engagement proxies
     has_economic_activity = case_when(
-      !is.na(dist_market) ~ TRUE,
+      !is.na(time_market) ~ TRUE,
       !is.na(local_market_share) ~ TRUE,
       TRUE ~ FALSE
     ),
@@ -745,68 +746,68 @@ desc_stats <- clean_df %>%
 # DATA CLEANING & PROCESSING on clean_df
 # ------------------------------------------------------------
 
-# Read shapefile
-shp_file <- st_read("gadm41_BDI_shp/gadm41_BDI_2.shp")
-
-# Create centroids
-centroids_data <- shp_file %>%
-  st_transform(3857) %>%
-  st_point_on_surface() %>%
-  st_transform(4326)
-
-# Extract longitude and latitude into columns
-coords <- st_coordinates(centroids_data)
-shp_file$centroid_lon <- coords[,1]
-shp_file$centroid_lat <- coords[,2]
-
-# Build a centroid lookup from the shapefile
-lookup_data <- shp_file %>%
-  st_drop_geometry() %>%          
-  transmute(
-    location2 = str_squish(str_to_lower(NAME_2)),       
-    centroid_lat,
-    centroid_lon
-  )
-
-# Fix possible case sensitive issues
-clean_df <- clean_df %>%
-  mutate(location2 = str_squish(str_to_lower(location2)))
-
-# Join to clean_df and update localization
-clean_df <- clean_df %>%
-  left_join(lookup_data, by = "location2") %>%
-  mutate(
-    gps_original = gps_loc,
-    
-    gps_loc = if_else(
-      is.na(gps_loc) & !is.na(centroid_lat) & !is.na(centroid_lon),
-      paste(centroid_lat, centroid_lon, "0 0"),
-      gps_loc
-    ),
-    
-    localization_source = case_when(
-      is.na(gps_original) &
-        !is.na(centroid_lat) &
-        !is.na(centroid_lon) ~ "location 2 centroids",
-      !is.na(gps_original) ~ "farm gps",
-      TRUE ~ "missing"
-    )
-  ) %>%
-  
-  # Extract latitude & longitude from gps_loc
-  separate(
-    gps_loc,
-    into = c("gps_loc_latitude", "gps_loc_longitude", "altitude", "accuracy"),
-    sep = " ",
-    remove = FALSE,
-    convert = TRUE
-  ) %>%
-  select(-centroid_lat, -centroid_lon, -gps_original) %>%
-  relocate(
-    localization_source, gps_loc, gps_loc_latitude, gps_loc_longitude,
-    .after = location2
-  ) 
-
+# # Read shapefile
+# shp_file <- st_read("gadm41_BDI_shp/gadm41_BDI_2.shp")
+# 
+# # Create centroids
+# centroids_data <- shp_file %>%
+#   st_transform(3857) %>%
+#   st_point_on_surface() %>%
+#   st_transform(4326)
+# 
+# # Extract longitude and latitude into columns
+# coords <- st_coordinates(centroids_data)
+# shp_file$centroid_lon <- coords[,1]
+# shp_file$centroid_lat <- coords[,2]
+# 
+# # Build a centroid lookup from the shapefile
+# lookup_data <- shp_file %>%
+#   st_drop_geometry() %>%          
+#   transmute(
+#     location2 = str_squish(str_to_lower(NAME_2)),       
+#     centroid_lat,
+#     centroid_lon
+#   )
+# 
+# # Fix possible case sensitive issues
+# clean_df <- clean_df %>%
+#   mutate(location2 = str_squish(str_to_lower(location2)))
+# 
+# # Join to clean_df and update localization
+# clean_df <- clean_df %>%
+#   left_join(lookup_data, by = "location2") %>%
+#   mutate(
+#     gps_original = gps_loc,
+#     
+#     gps_loc = if_else(
+#       is.na(gps_loc) & !is.na(centroid_lat) & !is.na(centroid_lon),
+#       paste(centroid_lat, centroid_lon, "0 0"),
+#       gps_loc
+#     ),
+#     
+#     localization_source = case_when(
+#       is.na(gps_original) &
+#         !is.na(centroid_lat) &
+#         !is.na(centroid_lon) ~ "location 2 centroids",
+#       !is.na(gps_original) ~ "farm gps",
+#       TRUE ~ "missing"
+#     )
+#   ) %>%
+#   
+#   # Extract latitude & longitude from gps_loc
+#   separate(
+#     gps_loc,
+#     into = c("gps_loc_latitude", "gps_loc_longitude", "altitude", "accuracy"),
+#     sep = " ",
+#     remove = FALSE,
+#     convert = TRUE
+#   ) %>%
+#   select(-centroid_lat, -centroid_lon, -gps_original) %>%
+#   relocate(
+#     localization_source, gps_loc, gps_loc_latitude, gps_loc_longitude,
+#     .after = location2
+#   ) 
+# 
 
 #---------------------------------------TO REVIEW-------------------------------
 # select data and prepare to export to db
@@ -820,15 +821,14 @@ clean_df <- clean_df %>%
 # To show the performance indicator at average and at farm level
 clean_df <- clean_df %>%
   mutate(
-    Farm_id = paste0("FARM", " ", row_number()),
-    country = "country")
+    Farm_id = paste0("FARM", " ", row_number()))
 
 data <- clean_df %>%
   select(
     Farm_id, country, region,
     gps_loc_latitude, gps_loc_longitude, area_total, hh_or_not,
     irrig, farm_mgt, hh_men, hh_women,sex_respondent,sex_head, 
-    age_head, agecon_focus, farminput_auto, dist_market,
+    age_head, agecon_focus, farminput_auto, time_market,
     "area_total",
     "plant_diversity", "temp_spatial_div", "anim_diversity",
     "mgt_pestdis",
@@ -994,7 +994,37 @@ criteria_map <- tibble::tibble(
     "prod_empow", "prod_empow",
     "prod_access", "prod_access"
   )
-)
+) %>% 
+  mutate(
+    Index = recode(Indexes,
+                          plant_diversity = "Plant diversity",
+                          temp_spatial_div = "Temporal and spatial diversity",
+                          anim_diversity = "Animal diversity (including fishes and insects)",
+                          crop_liv_aqua = "Plant-livestock-aquaculture integration",
+                          integ_trees = "Integration with trees",
+                          connect_ag = "Habitat management",
+                          seed_breed = "Use of seeds and breeds",
+                          recycling_biomass = "Biomass and waste management",
+                          water_energy = "Water and energy sources",
+                          mgt_soilfert = "Management of soil fertility",
+                          mgt_pestdis = "Management of pests and diseases",
+                          water_and_energy_use = "Water and energy use",
+                          soc_res = "Social resilience",
+                          econ_res = "Economic resilience",
+                          soil_conserve = "Soil conservation practices",
+                          dietdiv_foodself = "Dietary diversity and food self sufficiency",
+                          food_heritage = "Local and traditional food heritage",
+                          int_ageco = "Co-creation of knowledge",
+                          soc_know = "Peer learning and sharing of knowledge",
+                          wom_emp_caet = "Women empowerment",
+                          labour_socinq = "Labour conditions",
+                          labor_condition = "Motivation and youth installation",
+                          local_market = "Local and solidarity-based markets",
+                          local_circ = "Local sourcing and circularity",
+                          prod_empow = "Producers' empowerment",
+                          prod_access = "Producers' access to and control over resources"
+    )
+  )
 
 criteria <- criteria %>%
   left_join(criteria_map, by = "Criteria")
@@ -1114,7 +1144,7 @@ indexes <- clean_df %>%
     Farm_id, country, region,
     gps_loc_latitude, gps_loc_longitude, area_total, hh_or_not,
     irrig, farm_mgt, hh_men, hh_women,sex_respondent,sex_head, 
-    age_head, agecon_focus, farminput_auto, dist_market,
+    age_head, agecon_focus, farminput_auto, time_market,
     Index, index_score, Element
   )
 
@@ -1144,7 +1174,10 @@ element <- clean_df %>%
                      respgov_score = "Resg"
     )
   ) %>%
-  select(Farm_id, country, Element, avg_score)
+  select(Farm_id, country, region,
+         gps_loc_latitude, gps_loc_longitude, area_total, hh_or_not,
+         irrig, farm_mgt, hh_men, hh_women,sex_respondent,sex_head, 
+         age_head, agecon_focus, farminput_auto, time_market, Element, avg_score)
 
 # ---------- PostgreSQL export ----------
 con <- dbConnect(

@@ -824,7 +824,7 @@ desc_stats <- clean_df %>%
 # To show the performance indicator at average and at farm level
 clean_df <- clean_df %>%
   mutate(
-    Farm_id = paste0("FARM", " ", row_number()))
+    Farm_id = paste0(enumerator, " ", row_number()))
 
 data <- clean_df %>%
   select(
@@ -1165,16 +1165,16 @@ element <- clean_df %>%
   ) %>%
   mutate(
     Element = recode(Element,
-                     div_score = "Div",
-                     synergy_score = "Syn",
-                     efficiency_score = "Eff",
-                     recycling_score = "Rec",
-                     resilience_score = "Res",
+                     div_score = "Diversity",
+                     synergy_score = "Synergies",
+                     efficiency_score = "Efficiencies",
+                     recycling_score = "Recycling",
+                     resilience_score = "Resilience",
                      cultfood_score = "CulFood",
-                     cocrea_score = "Co-Cre",
+                     cocrea_score = "Co-Creation",
                      human_score = "Human",
-                     circular_score = "Circu",
-                     respgov_score = "Resg"
+                     circular_score = "Circular",
+                     respgov_score = "Responsible gov"
     )
   ) %>%
   select(Farm_id, country, region,
@@ -1183,6 +1183,7 @@ element <- clean_df %>%
          age_head, agecon_focus, farminput_auto, time_market, Element, avg_score)
 
 # ---------- PostgreSQL export ----------
+
 con <- dbConnect(
   RPostgres::Postgres(),
   dbname   = pg_db,

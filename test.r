@@ -241,7 +241,7 @@ survey_duration_df <- clean_df %>%
 # ------------------------------------------------------------
 
 survey_productivity_df <- survey_duration_df %>%
-  group_by(inquirer, today) %>%
+  group_by(enumerator, today) %>%
   summarise(
     interviews_per_day = n()
   ) 
@@ -831,7 +831,7 @@ clean_df <- clean_df %>%
 
 data <- clean_df %>%
   select(
-    Farm_id, country, region,
+    Farm_id,
     gps_loc_latitude, gps_loc_longitude, area_total, hh_or_not,
     irrig, farm_mgt, hh_men, hh_women,sex_respondent,sex_head, 
     age_head, agecon_focus, farminput_auto, time_market,
@@ -1147,7 +1147,7 @@ indexes <- clean_df %>%
     )
   ) %>%
   select(
-    Farm_id, country, region,
+    Farm_id,
     gps_loc_latitude, gps_loc_longitude, area_total, hh_or_not,
     irrig, farm_mgt, hh_men, hh_women,sex_respondent,sex_head, 
     age_head, agecon_focus, farminput_auto, time_market,
@@ -1180,7 +1180,7 @@ element <- clean_df %>%
                      respgov_score = "Responsible gov"
     )
   ) %>%
-  select(Farm_id, country, region,
+  select(Farm_id,
          gps_loc_latitude, gps_loc_longitude, area_total, hh_or_not,
          irrig, farm_mgt, hh_men, hh_women,sex_respondent,sex_head, 
          age_head, agecon_focus, farminput_auto, time_market, Element, avg_score)

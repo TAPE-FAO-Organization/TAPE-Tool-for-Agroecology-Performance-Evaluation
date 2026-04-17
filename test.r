@@ -918,6 +918,7 @@ criteria <- clean_df %>%
     onfarm_nutcycle,
     nitrogen_plant,
     onf_eco,
+    ## onf_eco_prac,
     use_vet,
     water_use_save, energy_use_save,
     community_coop, ext_finance,

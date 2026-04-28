@@ -37,8 +37,8 @@ stopifnot(
   kobo_token != "",
   pg_db != "",
   pg_host != "",
-  pg_user != ""
-  #  pg_pass    != ""
+  pg_user != "",
+  pg_pass    != ""
 )
 
 message("✅ Environment variables loaded")
@@ -47,9 +47,7 @@ message("✅ Environment variables loaded")
 ##### Note: Hardcoded Asset and export UIDs are not recommended for sensitive data.
 # No real data should be sent through any forms whose asset UIDs are exposed here.
 
-kobo_url <- "https://kobo.fao.org/api/v2/assets/aqQoBi5bUS6EViYAm36a6Z/export-settings/escGSkqvH7h5ZqxMuYP42Rj/data.csv"
-
-  #"https://kobo.fao.org/api/v2/assets/ajfT4SY4zcJPVqKCJuuQxH/export-settings/eswn645vPV35hd3ULUuZgG9/data.csv"
+kobo_url <- "https://kobo.fao.org/api/v2/assets/ajfT4SY4zcJPVqKCJuuQxH/export-settings/eswn645vPV35hd3ULUuZgG9/data.csv"
 
 
 res <- GET(

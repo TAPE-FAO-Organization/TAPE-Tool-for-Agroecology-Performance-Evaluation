@@ -907,6 +907,8 @@ clean_df <- clean_df %>%
 data <- clean_df %>%
   select(
     Farm_id,
+    project_code,
+    today,
     gps_loc_latitude,
     gps_loc_longitude,
     area_total,
@@ -916,6 +918,7 @@ data <- clean_df %>%
     hh_men,
     hh_women,
     sex_respondent,
+    irrig, 
     sex_head,
     age_head,
     agecon_focus,
@@ -1453,6 +1456,7 @@ dbWriteTable(con, "tape_criteria", criteria, overwrite = TRUE)
 
 dbExecute(con, "ANALYZE;")
 dbDisconnect(con)
+  
 
 message("✅ PostgreSQL tables updated successfully")
 message("🎯 Pipeline completed without errors")
